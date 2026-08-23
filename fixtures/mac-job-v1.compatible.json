@@ -1,0 +1,20 @@
+{
+  "schema": "mac-job/v1",
+  "job_id": "system-compatibility-0001",
+  "attempt": 1,
+  "repo_id": "example-repository",
+  "base_sha": "0000000000000000000000000000000000000000",
+  "target_sha": "0000000000000000000000000000000000000000",
+  "task_type": "review",
+  "focus": [
+    "transport"
+  ],
+  "write": false,
+  "allowed_paths": [],
+  "test_profile": "review-readonly",
+  "deadline_seconds": 1800,
+  "supervisor": "mac-codex",
+  "execution_route": "auto",
+  "preferred_worker": "ornith",
+  "required_capabilities": []
+}

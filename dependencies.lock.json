@@ -1,0 +1,28 @@
+{
+  "schema": "dual-agent-system/dependencies-v1",
+  "buzz": {
+    "repository": "https://github.com/block/buzz.git",
+    "tag": "desktop-v0.5.18",
+    "commit": "39f8b46935736334cdd7045a4e4b5d7eb1a33888",
+    "relay_image_digest": "sha256:fb2a31aada3aa0fba9faf2c5ea5500d163c1845af1a2204f1dc410c93fce6cc6",
+    "vendored": false
+  },
+  "codex_acp": {
+    "version": "1.6.2",
+    "vendored": false
+  },
+  "mac_runtime": {
+    "macos": "26.6.2-arm64",
+    "python": "3.14.7",
+    "ripgrep": "15.2.0-arm64",
+    "codex_cli": "0.149.0",
+    "ollama": "0.32.15",
+    "ornith_model": "ornith-ai/Ornith-1.0-9B-GGUF:Q6_K",
+    "ornith_context": 32768,
+    "model_weights_in_git": false
+  },
+  "windows_runtime": {
+    "python": ">=3.10",
+    "buzz_cli": "desktop-v0.5.18"
+  }
+}

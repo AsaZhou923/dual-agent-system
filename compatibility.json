@@ -1,0 +1,41 @@
+{
+  "schema": "dual-agent-system/compatibility-v1",
+  "system_version": "0.1.0-dev",
+  "network_scope": "intranet-only",
+  "readiness": {
+    "source_pins": "verified",
+    "component_ci": "verified",
+    "job_contract": "verified-compatible-readonly-subset",
+    "write_mode": "disabled",
+    "live_cross_machine": "pending-retest"
+  },
+  "components": {
+    "windows_lead": {
+      "repository": "https://github.com/AsaZhou923/dual-agent-windows-lead.git",
+      "path": "components/windows-lead",
+      "commit": "bac76e62db4652f60e48a0771015f6ab82f1280c",
+      "branch": "main"
+    },
+    "mac_runner": {
+      "repository": "https://github.com/AsaZhou923/dual-agent-mac-runner.git",
+      "path": "components/mac-runner",
+      "commit": "6dfff35a76ded101e72455bf3690492d5baf4b2d",
+      "branch": "main"
+    }
+  },
+  "protocols": {
+    "job": {
+      "wire_schema": "mac-job/v1",
+      "system_profile": "contracts/mac-job-v1-system.schema.json",
+      "fixture": "fixtures/mac-job-v1.compatible.json",
+      "producer_schema": "components/windows-lead/schemas/mac-job-v1.schema.json",
+      "consumer_schema": "components/mac-runner/schemas/job_schema.json",
+      "compatibility": "negotiated-subset"
+    },
+    "result": {
+      "producer_schema": "components/mac-runner/schemas/result_schema.json",
+      "windows_consumer": "thread-and-ledger-state-only",
+      "compatibility": "shared-result-contract-pending"
+    }
+  }
+}
