@@ -1,0 +1,37 @@
+{
+  "schema": "mac-job/v1",
+  "policy_version": 2,
+  "job_id": "system-compatibility-privileged-0002",
+  "attempt": 1,
+  "repo_id": "example-repository",
+  "base_sha": "0000000000000000000000000000000000000000",
+  "target_sha": "0000000000000000000000000000000000000000",
+  "task_type": "fix",
+  "focus": [
+    "owner-approved-service-restart"
+  ],
+  "permission_profile": "privileged",
+  "capabilities": [
+    "restart-user-service"
+  ],
+  "scope": {
+    "root": "registered-checkout"
+  },
+  "network": {
+    "mode": "none"
+  },
+  "verification_profiles": [
+    "service-health"
+  ],
+  "owner_approval": {
+    "approved_by": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "approval_ref": "synthetic-owner-approval",
+    "approved_at": "2026-08-23T12:00:00+09:00",
+    "summary": "Restart the configured example user service"
+  },
+  "deadline_seconds": 1800,
+  "supervisor": "mac-codex",
+  "execution_route": "auto",
+  "preferred_worker": "codex",
+  "required_capabilities": []
+}

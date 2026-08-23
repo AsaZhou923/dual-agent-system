@@ -7,7 +7,7 @@
 1. 在组件仓库完成修改、测试、commit 和 push。
 2. 在总仓库运行 `python3 scripts/update_component.py <component>`。
 3. 审查新的 submodule gitlink 和 `compatibility.json` commit。
-4. 必要时更新系统 contract、fixture 和依赖锁。
+4. 必要时更新系统 contract、覆盖全部 permission profile 的 fixtures 和依赖锁。
 5. 运行 `python3 scripts/verify_system.py`。
 6. 只提交两个 gitlink、兼容元数据和相关文档。
 
@@ -23,7 +23,7 @@ git clone --recurse-submodules https://github.com/AsaZhou923/dual-agent-system.g
 
 ## CI
 
-Root CI 会递归 checkout 两个公开 submodule，验证 gitlink、兼容 manifest、wire fixture 和 Windows Lead 测试。Mac Runner 的完整测试仍由其 macOS workflow 负责。
+Root CI 会递归 checkout 两个公开 submodule，验证 gitlink、兼容 manifest、四档 policy-v2 wire fixtures 和 Windows Lead 测试。Mac Runner 的完整执行测试仍由其 macOS workflow 负责。
 
 如果未来任何组件改回 Private，Root CI 将不能继续匿名初始化该 submodule。此时应使用只读 GitHub App 或最小权限 fine-grained token，不要复用个人长期 token。
 

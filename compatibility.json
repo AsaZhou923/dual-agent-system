@@ -1,25 +1,25 @@
 {
   "schema": "dual-agent-system/compatibility-v1",
-  "system_version": "0.1.0-dev",
+  "system_version": "0.2.0-dev",
   "network_scope": "intranet-only",
   "readiness": {
     "source_pins": "verified",
     "component_ci": "verified",
-    "job_contract": "verified-compatible-readonly-subset",
-    "write_mode": "disabled",
-    "live_cross_machine": "pending-retest"
+    "job_contract": "verified-policy-v2-component-intersection",
+    "write_mode": "policy-v2-compatible-cutover-pending",
+    "live_cross_machine": "pending-policy-v2-retest"
   },
   "components": {
     "windows_lead": {
       "repository": "https://github.com/AsaZhou923/dual-agent-windows-lead.git",
       "path": "components/windows-lead",
-      "commit": "bac76e62db4652f60e48a0771015f6ab82f1280c",
+      "commit": "8841e744d7c785a233dfc97fb67b1455aa55a33d",
       "branch": "main"
     },
     "mac_runner": {
       "repository": "https://github.com/AsaZhou923/dual-agent-mac-runner.git",
       "path": "components/mac-runner",
-      "commit": "6dfff35a76ded101e72455bf3690492d5baf4b2d",
+      "commit": "a31a1701996f686cff3893ea2359f77c91ef1e2c",
       "branch": "main"
     }
   },
@@ -27,10 +27,28 @@
     "job": {
       "wire_schema": "mac-job/v1",
       "system_profile": "contracts/mac-job-v1-system.schema.json",
-      "fixture": "fixtures/mac-job-v1.compatible.json",
+      "fixtures": [
+        "fixtures/mac-job-v1.compatible.json",
+        "fixtures/mac-job-v1.standard-worktree.json",
+        "fixtures/mac-job-v1.operational.json",
+        "fixtures/mac-job-v1.privileged.json"
+      ],
       "producer_schema": "components/windows-lead/schemas/mac-job-v1.schema.json",
       "consumer_schema": "components/mac-runner/schemas/job_schema.json",
-      "compatibility": "negotiated-subset"
+      "compatibility": "policy-v2-negotiated-intersection",
+      "permission_profiles": [
+        "observe",
+        "standard-worktree",
+        "operational",
+        "privileged"
+      ],
+      "operational_capabilities": [
+        "install-user-tool",
+        "manage-pr",
+        "push-task-branch",
+        "restart-user-service",
+        "sync-registered-repo"
+      ]
     },
     "result": {
       "producer_schema": "components/mac-runner/schemas/result_schema.json",

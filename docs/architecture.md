@@ -38,15 +38,17 @@ SENT -> ACKED -> RUNNING -> VERIFYING -> DONE / FAILED / CANCELLED
 
 ## 协议边界
 
-两个组件当前各自包含 `mac-job/v1` schema，但约束不完全相同。总仓库的 `contracts/mac-job-v1-system.schema.json` 定义两边都接受的协商子集：
+两个组件各自包含 `mac-job/v1` schema，总仓库的 `contracts/mac-job-v1-system.schema.json` 定义两边都接受的严格 policy-v2 交集：
 
 - `focus` 必填；
 - 只允许小写 40 位 Git SHA；
-- 当前仅允许 `write=false`；
-- 当前路由只允许 `auto` 或 `ornith`；
-- 不在 wire payload 中发送 Mac Runner 未声明的扩展字段。
+- 权限 profile 为 `observe`、`standard-worktree`、`operational`、`privileged`；
+- 普通代码任务一次授权整个 task worktree，`scope.paths` 只用于缩小范围；
+- operational/privileged 每个任务只授权一个命名 capability，privileged 还必须绑定结构化 owner approval；
+- 当前路由只取两端交集：`auto`、`ornith` 或 `ornith-then-codex`；
+- `context`/`extensions` 只承载描述信息，不参与权限判定。
 
-扩大写入或路由能力必须同时更新两个组件、系统 profile、兼容 fixture 和 submodule 指针。
+生产运行时从 legacy wire 切换到 policy v2 之前，仍必须完成 Mac 部署、账本迁移和真实跨机 canary；源码兼容状态不得替代生产验收。
 
 ## 网络边界
 

@@ -23,10 +23,12 @@
 -> 更新单个服务
 -> MCP/ACP 握手
 -> read-only compatibility job
+-> standard-worktree policy-v2 canary
+-> 每个启用的 operational capability 独立 canary
 -> 原 thread ACK/状态核验
 -> Windows Lead 最终接受
 ```
 
 不得通过移动或删除正在运行的旧目录完成切换。保留旧源码路径和服务定义，直到新版本握手和回滚验证完成。
 
-当前组件 source pin 和 CI 已验证；真实跨机器闭环仍需使用新的 attempt 重新验收，因此不得把本仓库存在等同于生产链路完成。
+当前组件 source pin 和 policy-v2 合同已验证；真实跨机器闭环仍需使用新的 attempt 重新验收。完成前 Windows 必须保持旧 wire gate，不能把总仓库的源码兼容状态等同于生产切换完成。

@@ -14,17 +14,18 @@ Windows Codex Lead
 
 | 组件 | 仓库 | 当前固定 commit |
 | --- | --- | --- |
-| Windows Lead | `components/windows-lead` | `bac76e62db4652f60e48a0771015f6ab82f1280c` |
-| Mac Runner | `components/mac-runner` | `6dfff35a76ded101e72455bf3690492d5baf4b2d` |
+| Windows Lead | `components/windows-lead` | `8841e744d7c785a233dfc97fb67b1455aa55a33d` |
+| Mac Runner | `components/mac-runner` | `a31a1701996f686cff3893ea2359f77c91ef1e2c` |
 
 两个目录都是公开 Git submodule。组件独立版本控制，总仓库 commit 表示一组明确的系统组合。
 
 ## 当前状态
 
-- 两个组件的固定 commit 和各自 CI 已通过。
-- `mac-job/v1` 的完整组件 schema 存在差异；本仓库定义了两边都接受的只读协商子集。
-- 当前系统 profile 强制 `write=false`。
-- Mac Runner 已包含 Homebrew `rg` PATH 修正及相关依赖说明，但修正后的真实跨机器任务尚未重新验收。
+- 两个组件固定到已发布 commit；本地组件/合同验证已通过，GitHub-hosted CI 以对应 commit status 为准。
+- `mac-job/v1` system profile 已升级为两端都接受的严格 policy v2 交集。
+- `observe`、`standard-worktree`、`operational`、`privileged` 四档 profile 和五个命名 operational capability 已通过组件 validator fixture 验证。
+- 源码兼容不等于生产切换：Windows 运行时仍须在 Mac 部署与 policy-v2 跨机 canary 通过后，才能把 contract/profile gate 切为 `2/true`。
+- Buzz 固定到用户 fork 的 `6793b4ef98b11a64e4ead1e88ee5ec33ebe3f002`，包含 NIP-OA owner 保留和 observer NIP-44 明文上限修复。
 - 网络范围仍是 `intranet-only`。
 
 ## Clone
@@ -53,7 +54,7 @@ git submodule update --init --recursive
 - `scripts/verify_system.py` — gitlink 与跨组件契约验证
 - `scripts/update_component.py` — 拉取组件 `main` 并同步本地 gitlink/兼容 manifest，不自动 commit 或 push
 - `docs/` — 架构、兼容、版本、部署和安全边界
-- `deploy/buzz/` — Buzz upstream 部署引用
+- `deploy/buzz/` — Buzz upstream 基线与固定修复 commit 的部署引用
 
 ## Verification
 

@@ -66,13 +66,25 @@ def normalized_repository(value: str) -> str:
 
 def verify_metadata(*, prefer_worktree_gitlinks: bool = False) -> dict[str, Any]:
     compatibility = load_json(COMPATIBILITY_PATH)
-    load_json(DEPENDENCIES_PATH)
+    dependencies = load_json(DEPENDENCIES_PATH)
     load_json(SYSTEM_SCHEMA_PATH)
 
     if compatibility.get("schema") != "dual-agent-system/compatibility-v1":
         raise VerificationError("unsupported compatibility manifest schema")
     if compatibility.get("network_scope") != "intranet-only":
         raise VerificationError("network_scope must remain intranet-only")
+
+    buzz = dependencies.get("buzz")
+    if not isinstance(buzz, dict):
+        raise VerificationError("dependencies.lock.json must define Buzz")
+    for field in ("repository", "branch", "commit", "upstream_repository", "upstream_commit"):
+        if not isinstance(buzz.get(field), str) or not buzz[field]:
+            raise VerificationError(f"Buzz dependency field is required: {field}")
+    for field in ("commit", "upstream_commit"):
+        if not re.fullmatch(r"[0-9a-f]{40}", buzz[field]):
+            raise VerificationError(f"Buzz {field} must be a full lowercase Git commit")
+    if buzz.get("vendored") is not False:
+        raise VerificationError("Buzz must remain an external non-vendored dependency")
 
     modules = configparser.ConfigParser()
     modules.read(ROOT / ".gitmodules", encoding="utf-8")
@@ -100,8 +112,12 @@ def verify_metadata(*, prefer_worktree_gitlinks: bool = False) -> dict[str, Any]
             raise VerificationError(f".gitmodules URL mismatch for {path}")
 
     readiness = compatibility.get("readiness", {})
-    if readiness.get("write_mode") != "disabled":
-        raise VerificationError("the v0.1 system profile must keep write mode disabled")
+    if readiness.get("job_contract") != "verified-policy-v2-component-intersection":
+        raise VerificationError("job contract readiness must describe the policy-v2 component intersection")
+    if readiness.get("write_mode") != "policy-v2-compatible-cutover-pending":
+        raise VerificationError("write mode must remain behind the policy-v2 production cutover gate")
+    if readiness.get("live_cross_machine") != "pending-policy-v2-retest":
+        raise VerificationError("policy-v2 live cross-machine verification must remain pending")
     return compatibility
 
 
@@ -117,6 +133,11 @@ def load_module(name: str, path: Path) -> ModuleType:
 
 def schema_enum(schema: dict[str, Any], field: str) -> set[Any] | None:
     value = schema.get("properties", {}).get(field, {}).get("enum")
+    return set(value) if isinstance(value, list) else None
+
+
+def schema_item_enum(schema: dict[str, Any], field: str) -> set[Any] | None:
+    value = schema.get("properties", {}).get(field, {}).get("items", {}).get("enum")
     return set(value) if isinstance(value, list) else None
 
 
@@ -139,15 +160,44 @@ def verify_components(compatibility: dict[str, Any]) -> None:
 
     protocols = compatibility["protocols"]
     job_protocol = protocols["job"]
-    fixture = load_json(ROOT / job_protocol["fixture"])
     system_schema = load_json(ROOT / job_protocol["system_profile"])
     windows_schema = load_json(ROOT / job_protocol["producer_schema"])
     mac_schema = load_json(ROOT / job_protocol["consumer_schema"])
 
-    if windows.validate_job(fixture) != fixture:
-        raise VerificationError("Windows Lead normalized the compatibility fixture unexpectedly")
-    mac.SimpleSchemaValidator(mac_schema).validate(fixture)
-    mac.SimpleSchemaValidator(system_schema).validate(fixture)
+    fixture_paths = job_protocol.get("fixtures")
+    if not isinstance(fixture_paths, list) or not fixture_paths or not all(
+        isinstance(path, str) and path for path in fixture_paths
+    ):
+        raise VerificationError("job protocol must define non-empty policy-v2 fixtures")
+
+    fixture_profiles: set[str] = set()
+    for fixture_path in fixture_paths:
+        fixture = load_json(ROOT / fixture_path)
+        if windows.validate_job(fixture) != fixture:
+            raise VerificationError(
+                f"Windows Lead normalized compatibility fixture unexpectedly: {fixture_path}"
+            )
+        mac.SimpleSchemaValidator(mac_schema).validate(fixture)
+        mac.SimpleSchemaValidator(system_schema).validate(fixture)
+        canonical, _wire = mac.normalize_job_payload(fixture)
+        for field in (
+            "policy_version",
+            "permission_profile",
+            "capabilities",
+            "network",
+            "verification_profiles",
+        ):
+            if canonical.get(field) != fixture.get(field):
+                raise VerificationError(f"Mac Runner changed {field} in fixture: {fixture_path}")
+        canonical_scope = canonical.get("scope", {})
+        fixture_scope = fixture.get("scope", {})
+        if canonical_scope.get("root") != fixture_scope.get("root") or canonical_scope.get(
+            "paths", []
+        ) != fixture_scope.get("paths", []):
+            raise VerificationError(f"Mac Runner changed scope in fixture: {fixture_path}")
+        if fixture.get("owner_approval") != canonical.get("owner_approval"):
+            raise VerificationError(f"Mac Runner changed owner approval in fixture: {fixture_path}")
+        fixture_profiles.add(str(fixture["permission_profile"]))
 
     system_properties = set(system_schema["properties"])
     system_required = set(system_schema["required"])
@@ -161,7 +211,13 @@ def verify_components(compatibility: dict[str, Any]) -> None:
             missing = sorted(required - system_required)
             raise VerificationError(f"system profile omits fields required by {name}: {missing}")
 
-    for field in ("schema", "task_type", "execution_route", "preferred_worker"):
+    for field in (
+        "schema",
+        "task_type",
+        "execution_route",
+        "preferred_worker",
+        "permission_profile",
+    ):
         system_values = schema_enum(system_schema, field)
         if system_values is None:
             continue
@@ -170,6 +226,21 @@ def verify_components(compatibility: dict[str, Any]) -> None:
             if component_values is not None and not system_values <= component_values:
                 unsupported = sorted(system_values - component_values)
                 raise VerificationError(f"{name} rejects {field} values: {unsupported}")
+
+    system_profiles = schema_enum(system_schema, "permission_profile")
+    declared_profiles = set(job_protocol.get("permission_profiles", []))
+    if system_profiles != declared_profiles or fixture_profiles != system_profiles:
+        raise VerificationError("system schema, compatibility manifest, and fixtures must cover the same profiles")
+
+    system_capabilities = schema_item_enum(system_schema, "capabilities")
+    declared_capabilities = set(job_protocol.get("operational_capabilities", []))
+    if system_capabilities != declared_capabilities:
+        raise VerificationError("system schema and compatibility manifest capability sets differ")
+    for name, schema in (("Windows Lead", windows_schema), ("Mac Runner", mac_schema)):
+        component_capabilities = schema_item_enum(schema, "capabilities")
+        if component_capabilities is not None and not system_capabilities <= component_capabilities:
+            unsupported = sorted(system_capabilities - component_capabilities)
+            raise VerificationError(f"{name} rejects operational capabilities: {unsupported}")
 
     load_json(ROOT / protocols["result"]["producer_schema"])
 

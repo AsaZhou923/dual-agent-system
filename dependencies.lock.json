@@ -1,9 +1,16 @@
 {
   "schema": "dual-agent-system/dependencies-v1",
   "buzz": {
-    "repository": "https://github.com/block/buzz.git",
+    "repository": "https://github.com/AsaZhou923/buzz.git",
+    "branch": "codex/activity-fix-live-20260822-b1",
     "tag": "desktop-v0.5.18",
-    "commit": "39f8b46935736334cdd7045a4e4b5d7eb1a33888",
+    "commit": "6793b4ef98b11a64e4ead1e88ee5ec33ebe3f002",
+    "upstream_repository": "https://github.com/block/buzz.git",
+    "upstream_commit": "39f8b46935736334cdd7045a4e4b5d7eb1a33888",
+    "patches": [
+      "preserve-nip-oa-ownership",
+      "observer-nip44-plaintext-boundary"
+    ],
     "relay_image_digest": "sha256:fb2a31aada3aa0fba9faf2c5ea5500d163c1845af1a2204f1dc410c93fce6cc6",
     "vendored": false
   },
@@ -23,6 +30,6 @@
   },
   "windows_runtime": {
     "python": ">=3.10",
-    "buzz_cli": "desktop-v0.5.18"
+    "buzz_cli": "desktop-v0.5.18+6793b4ef"
   }
 }

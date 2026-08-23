@@ -22,7 +22,9 @@ jobs:
           python -m json.tool compatibility.json >/dev/null
           python -m json.tool dependencies.lock.json >/dev/null
           python -m json.tool contracts/mac-job-v1-system.schema.json >/dev/null
-          python -m json.tool fixtures/mac-job-v1.compatible.json >/dev/null
+          for fixture in fixtures/mac-job-v1*.json; do
+            python -m json.tool "$fixture" >/dev/null
+          done
       - name: Verify pinned metadata
         run: python scripts/verify_system.py --metadata-only
       - name: Verify initialized components and wire contract

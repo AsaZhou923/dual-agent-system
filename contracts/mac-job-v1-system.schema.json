@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/AsaZhou923/dual-agent-system/contracts/mac-job-v1-system.schema.json",
   "title": "Dual Agent mac-job/v1 system profile",
-  "description": "Read-only interoperable subset accepted by the pinned Windows Lead and Mac Runner revisions.",
+  "description": "Strict policy-v2 intersection accepted by the pinned Windows Lead and Mac Runner revisions.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -14,9 +14,12 @@
     "target_sha",
     "task_type",
     "focus",
-    "write",
-    "allowed_paths",
-    "test_profile",
+    "policy_version",
+    "permission_profile",
+    "capabilities",
+    "scope",
+    "network",
+    "verification_profiles",
     "deadline_seconds",
     "supervisor",
     "execution_route",
@@ -57,7 +60,8 @@
         "review",
         "analyze",
         "fix",
-        "test"
+        "test",
+        "sync"
       ]
     },
     "focus": {
@@ -70,22 +74,113 @@
       "minItems": 1,
       "maxItems": 32
     },
-    "write": {
-      "type": "boolean",
+    "policy_version": {
+      "const": 2
+    },
+    "permission_profile": {
+      "type": "string",
       "enum": [
-        false
+        "observe",
+        "standard-worktree",
+        "operational",
+        "privileged"
       ]
     },
-    "allowed_paths": {
+    "capabilities": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": [
+          "sync-registered-repo",
+          "push-task-branch",
+          "manage-pr",
+          "install-user-tool",
+          "restart-user-service"
+        ]
       },
-      "maxItems": 0
+      "uniqueItems": true,
+      "maxItems": 1
     },
-    "test_profile": {
-      "type": "string",
-      "pattern": "^[A-Za-z0-9._-]{1,64}$"
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root"
+      ],
+      "properties": {
+        "root": {
+          "type": "string",
+          "enum": [
+            "metadata-only",
+            "worktree",
+            "registered-checkout"
+          ]
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "maxItems": 128
+        }
+      }
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "none",
+            "declared-remotes-and-registries"
+          ]
+        }
+      }
+    },
+    "verification_profiles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9._-]{1,64}$"
+      },
+      "minItems": 1,
+      "maxItems": 32
+    },
+    "owner_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approved_by",
+        "approval_ref",
+        "approved_at",
+        "summary"
+      ],
+      "properties": {
+        "approved_by": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "approval_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
     },
     "deadline_seconds": {
       "type": "integer",
@@ -102,7 +197,8 @@
       "type": "string",
       "enum": [
         "auto",
-        "ornith"
+        "ornith",
+        "ornith-then-codex"
       ]
     },
     "preferred_worker": {
@@ -119,6 +215,216 @@
         "pattern": "^[A-Za-z0-9._:-]{1,64}$"
       },
       "maxItems": 32
+    },
+    "context": {
+      "type": "object"
+    },
+    "extensions": {
+      "type": "object"
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "permission_profile": {
+            "const": "observe"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "capabilities": {
+            "maxItems": 0
+          },
+          "scope": {
+            "properties": {
+              "root": {
+                "enum": [
+                  "metadata-only",
+                  "worktree"
+                ]
+              }
+            }
+          },
+          "network": {
+            "properties": {
+              "mode": {
+                "const": "none"
+              }
+            }
+          }
+        },
+        "not": {
+          "required": [
+            "owner_approval"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "permission_profile": {
+            "const": "standard-worktree"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "capabilities": {
+            "maxItems": 0
+          },
+          "scope": {
+            "properties": {
+              "root": {
+                "const": "worktree"
+              }
+            }
+          },
+          "network": {
+            "properties": {
+              "mode": {
+                "const": "none"
+              }
+            }
+          }
+        },
+        "not": {
+          "required": [
+            "owner_approval"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "permission_profile": {
+            "const": "operational"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "capabilities": {
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "scope": {
+            "properties": {
+              "root": {
+                "const": "registered-checkout"
+              }
+            }
+          }
+        },
+        "not": {
+          "required": [
+            "owner_approval"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "permission_profile": {
+            "const": "privileged"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "owner_approval"
+        ],
+        "properties": {
+          "capabilities": {
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "scope": {
+            "properties": {
+              "root": {
+                "const": "registered-checkout"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "capabilities": {
+            "contains": {
+              "const": "restart-user-service"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "network": {
+            "properties": {
+              "mode": {
+                "const": "none"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "capabilities": {
+            "contains": {
+              "enum": [
+                "sync-registered-repo",
+                "push-task-branch",
+                "manage-pr",
+                "install-user-tool"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "network": {
+            "properties": {
+              "mode": {
+                "const": "declared-remotes-and-registries"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "scope": {
+            "properties": {
+              "root": {
+                "const": "metadata-only"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "scope": {
+            "properties": {
+              "paths": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }
