@@ -7,4 +7,6 @@
 - Do not enable write mode without compatible component releases and cross-machine verification.
 - Never commit real config, credentials, identities, network coordinates, SQLite, dumps, logs, worktrees, artifacts, model files, or binaries.
 - Run `python3 scripts/verify_system.py` before committing submodule or compatibility changes.
+- Run `python3 -m unittest discover -s tests -v` after changing system helper scripts.
+- Use `python3 scripts/update_component.py <component>` to update public submodule pointers; review and stage the result explicitly.
 - Keep third-party dependencies pinned in `dependencies.lock.json`; do not vendor them here.

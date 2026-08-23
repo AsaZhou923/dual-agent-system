@@ -17,7 +17,7 @@ Windows Codex Lead
 | Windows Lead | `components/windows-lead` | `bac76e62db4652f60e48a0771015f6ab82f1280c` |
 | Mac Runner | `components/mac-runner` | `6dfff35a76ded101e72455bf3690492d5baf4b2d` |
 
-两个目录都是 Git submodule。组件独立版本控制，总仓库 commit 表示一组明确的系统组合。
+两个目录都是公开 Git submodule。组件独立版本控制，总仓库 commit 表示一组明确的系统组合。
 
 ## 当前状态
 
@@ -37,7 +37,7 @@ cd dual-agent-system
 python3 scripts/verify_system.py
 ```
 
-Windows Lead 是私有仓库；clone 前需要相应 GitHub 读取权限。已有 checkout 可执行：
+两个组件仓库当前都是 Public，普通 clone 可以直接初始化。已有 checkout 可执行：
 
 ```bash
 git submodule update --init --recursive
@@ -51,6 +51,7 @@ git submodule update --init --recursive
 - `compatibility.json` — component、protocol 和 readiness 状态
 - `dependencies.lock.json` — 不 vendoring 的第三方基线
 - `scripts/verify_system.py` — gitlink 与跨组件契约验证
+- `scripts/update_component.py` — 拉取组件 `main` 并同步本地 gitlink/兼容 manifest，不自动 commit 或 push
 - `docs/` — 架构、兼容、版本、部署和安全边界
 - `deploy/buzz/` — Buzz upstream 部署引用
 
@@ -60,10 +61,50 @@ git submodule update --init --recursive
 
 ```bash
 python3 scripts/verify_system.py
+python3 -m unittest discover -s tests -v
 PYTHONPATH=components/windows-lead python3 -m unittest discover -s components/windows-lead/tests -v
 ```
 
 Mac Runner 的完整测试依赖 macOS，应在 Mac 或其 GitHub Actions 中运行。
+
+## 日常更新工作流
+
+Git 不会把组件仓库的新 commit 自动写进总仓库。更新分为两次明确的版本提交。
+
+先在组件自己的 checkout 中修改、测试并 push：
+
+```bash
+cd /path/to/dual-agent-windows-lead
+git status --short --branch
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
+git add <明确文件>
+git commit
+git push
+```
+
+再让总仓库固定新的组件 commit：
+
+```bash
+cd /path/to/dual-agent-system
+python3 scripts/update_component.py windows-lead
+git diff --submodule=log
+python3 scripts/verify_system.py
+git add components/windows-lead compatibility.json
+git commit
+git push
+```
+
+Mac 组件使用同样流程，把参数改为 `mac-runner`。一次检查两个组件可使用：
+
+```bash
+python3 scripts/update_component.py all
+```
+
+辅助脚本只更新本地 checkout 和 `compatibility.json`，不会自动提交或推送；这样兼容 contract 变化仍需要人工 review。
+
+## Git 与运行环境
+
+`git push` 只更新 GitHub，不会自动替换正在运行的 MCP、launchd、配置或 skill 安装副本。生产环境应运行仓库 checkout，或使用经过验证的安装/同步步骤。当前 Windows MCP 仍使用旧运行目录时，在 GitHub 修改代码不会自动部署到该进程；切换必须单独完成握手和回滚验证。
 
 ## Source of truth
 

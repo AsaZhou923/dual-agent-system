@@ -5,8 +5,8 @@
 ## 更新顺序
 
 1. 在组件仓库完成修改、测试、commit 和 push。
-2. 在总仓库中 checkout 需要的组件 commit。
-3. 更新 `compatibility.json` 中的 commit。
+2. 在总仓库运行 `python3 scripts/update_component.py <component>`。
+3. 审查新的 submodule gitlink 和 `compatibility.json` commit。
 4. 必要时更新系统 contract、fixture 和依赖锁。
 5. 运行 `python3 scripts/verify_system.py`。
 6. 只提交两个 gitlink、兼容元数据和相关文档。
@@ -19,8 +19,14 @@
 git clone --recurse-submodules https://github.com/AsaZhou923/dual-agent-system.git
 ```
 
-Windows Lead 是私有 submodule，clone 用户必须已经拥有该仓库的读取权限和 GitHub HTTPS 凭据。
+两个组件当前都是 Public submodule，普通 clone 和 GitHub-hosted CI 可以直接初始化。
 
-## CI 权限
+## CI
 
-GitHub 默认的仓库 `GITHUB_TOKEN` 不能自动读取另一个私有仓库。因此默认 CI 只验证总仓库的 gitlink 和兼容元数据，不初始化 submodule。需要完整跨组件 CI 时，应创建只读 GitHub App 或最小权限 fine-grained token，并作为独立 secret 配置；不要复用个人长期 token。
+Root CI 会递归 checkout 两个公开 submodule，验证 gitlink、兼容 manifest、wire fixture 和 Windows Lead 测试。Mac Runner 的完整测试仍由其 macOS workflow 负责。
+
+如果未来任何组件改回 Private，Root CI 将不能继续匿名初始化该 submodule。此时应使用只读 GitHub App 或最小权限 fine-grained token，不要复用个人长期 token。
+
+## 运行副本
+
+版本提交和部署是两步。组件 push 后，总仓库必须更新 gitlink；总仓库 push 后，节点上的 MCP/launchd 也不会自动重启或切换源码路径。部署应继续遵循“测试 -> 单服务切换 -> 握手 -> 保留旧路径回滚”的顺序。

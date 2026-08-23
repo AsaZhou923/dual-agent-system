@@ -53,11 +53,18 @@ def staged_gitlink(path: str) -> str:
     return fields[1]
 
 
+def component_gitlink(path: str, *, prefer_worktree: bool) -> str:
+    component_path = ROOT / path
+    if prefer_worktree and (component_path / ".git").exists():
+        return run_git("rev-parse", "HEAD", cwd=component_path)
+    return staged_gitlink(path)
+
+
 def normalized_repository(value: str) -> str:
     return value.removesuffix(".git").rstrip("/")
 
 
-def verify_metadata() -> dict[str, Any]:
+def verify_metadata(*, prefer_worktree_gitlinks: bool = False) -> dict[str, Any]:
     compatibility = load_json(COMPATIBILITY_PATH)
     load_json(DEPENDENCIES_PATH)
     load_json(SYSTEM_SCHEMA_PATH)
@@ -81,7 +88,7 @@ def verify_metadata() -> dict[str, Any]:
         repository = component.get("repository")
         if not all(isinstance(value, str) and value for value in (path, expected_commit, repository)):
             raise VerificationError("component path, commit, and repository are required")
-        if staged_gitlink(path) != expected_commit:
+        if component_gitlink(path, prefer_worktree=prefer_worktree_gitlinks) != expected_commit:
             raise VerificationError(f"{path} gitlink does not match compatibility.json")
 
         section = f'submodule "{path}"'
@@ -176,7 +183,7 @@ def main() -> int:
     )
     arguments = parser.parse_args()
     try:
-        compatibility = verify_metadata()
+        compatibility = verify_metadata(prefer_worktree_gitlinks=not arguments.metadata_only)
         if not arguments.metadata_only:
             verify_components(compatibility)
     except (OSError, ValueError, VerificationError) as error:
