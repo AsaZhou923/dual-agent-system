@@ -13,7 +13,7 @@
     "windows_lead": {
       "repository": "https://github.com/AsaZhou923/dual-agent-windows-lead.git",
       "path": "components/windows-lead",
-      "commit": "8841e744d7c785a233dfc97fb67b1455aa55a33d",
+      "commit": "1956d5da42a0660bace0943c72bf299bc1cf690b",
       "branch": "main"
     },
     "mac_runner": {

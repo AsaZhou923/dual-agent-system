@@ -23,7 +23,7 @@
   ],
   "deadline_seconds": 1800,
   "supervisor": "mac-codex",
-  "execution_route": "auto",
-  "preferred_worker": "ornith",
+  "execution_route": "codex",
+  "preferred_worker": "codex",
   "required_capabilities": []
 }
