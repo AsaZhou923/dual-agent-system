@@ -60,6 +60,7 @@
         "review",
         "analyze",
         "fix",
+        "prepare",
         "test",
         "sync"
       ]
@@ -92,6 +93,7 @@
         "type": "string",
         "enum": [
           "sync-registered-repo",
+          "prepare-registered-repo",
           "push-task-branch",
           "manage-pr",
           "install-user-tool",
@@ -198,8 +200,7 @@
       "enum": [
         "auto",
         "ornith",
-        "codex",
-        "ornith-then-codex"
+        "codex"
       ]
     },
     "preferred_worker": {
@@ -289,6 +290,12 @@
                 "const": "none"
               }
             }
+          },
+          "execution_route": {
+            "enum": [
+              "auto",
+              "codex"
+            ]
           }
         },
         "not": {
@@ -318,6 +325,9 @@
                 "const": "registered-checkout"
               }
             }
+          },
+          "execution_route": {
+            "const": "auto"
           }
         },
         "not": {
@@ -350,6 +360,9 @@
                 "const": "registered-checkout"
               }
             }
+          },
+          "execution_route": {
+            "const": "auto"
           }
         }
       }
@@ -359,7 +372,35 @@
         "properties": {
           "capabilities": {
             "contains": {
-              "const": "restart-user-service"
+              "const": "prepare-registered-repo"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "task_type": {
+            "const": "prepare"
+          },
+          "network": {
+            "properties": {
+              "mode": {
+                "const": "none"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "capabilities": {
+            "contains": {
+              "enum": [
+                "prepare-registered-repo",
+                "restart-user-service"
+              ]
             }
           }
         }

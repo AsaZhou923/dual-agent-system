@@ -1,0 +1,31 @@
+{
+  "schema": "mac-job/v1",
+  "policy_version": 2,
+  "job_id": "system-compatibility-prepare-0001",
+  "attempt": 1,
+  "repo_id": "example-repository",
+  "base_sha": "0000000000000000000000000000000000000000",
+  "target_sha": "0000000000000000000000000000000000000000",
+  "task_type": "prepare",
+  "focus": [
+    "registered-checkout-preparation"
+  ],
+  "permission_profile": "operational",
+  "capabilities": [
+    "prepare-registered-repo"
+  ],
+  "scope": {
+    "root": "registered-checkout"
+  },
+  "network": {
+    "mode": "none"
+  },
+  "verification_profiles": [
+    "review-readonly"
+  ],
+  "deadline_seconds": 1800,
+  "supervisor": "mac-codex",
+  "execution_route": "auto",
+  "preferred_worker": "codex",
+  "required_capabilities": []
+}

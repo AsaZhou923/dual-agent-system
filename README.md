@@ -15,7 +15,7 @@ Windows Codex Lead
 | 组件 | 仓库 | 当前固定 commit |
 | --- | --- | --- |
 | Windows Lead | `components/windows-lead` | `1956d5da42a0660bace0943c72bf299bc1cf690b` |
-| Mac Runner | `components/mac-runner` | `a31a1701996f686cff3893ea2359f77c91ef1e2c` |
+| Mac Runner | `components/mac-runner` | `c0a14b10fb1261babaa07eab7018bd476b179c1d` |
 
 两个目录都是公开 Git submodule。组件独立版本控制，总仓库 commit 表示一组明确的系统组合。
 
@@ -23,8 +23,8 @@ Windows Codex Lead
 
 - 两个组件固定到已发布 commit；本地组件/合同验证已通过，GitHub-hosted CI 以对应 commit status 为准。
 - `mac-job/v1` system profile 已升级为两端都接受的严格 policy v2 交集。
-- `observe`、`standard-worktree`、`operational`、`privileged` 四档 profile、canonical `codex` route 和五个命名 operational capability 已通过组件 validator fixture 验证。Windows 组件额外支持的 network-free `prepare-registered-repo` 尚未进入当前 Mac source pin 的系统交集。
-- 源码兼容、Windows sender 切换和完整跨机验收是三个独立门禁：Windows 生产运行时已读回 contract/profile `2/true`，但真实 canary 仍在 Mac 侧临时目录与配置不变性证据上失败，因此总仓 readiness 继续保持 pending。
+- `observe`、`standard-worktree`、`operational`、`privileged` 四档 profile、canonical `codex` route 和六个命名 operational capability 已通过组件 validator fixture 验证；其中 `prepare-registered-repo` 独占、断网且仅用于注册 checkout 准备。
+- Mac 修复已并入 `main`，目标临时分支已删除，分支与 `main` 的 macOS CI 均成功。源码 pin 已闭环，但生产 Mac 部署和新的跨机 canary 尚未执行，因此总仓 runtime readiness 继续保持 pending。
 - Buzz 固定到用户 fork 的 `6793b4ef98b11a64e4ead1e88ee5ec33ebe3f002`，包含 NIP-OA owner 保留和 observer NIP-44 明文上限修复。
 - 网络范围仍是 `intranet-only`。
 
