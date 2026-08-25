@@ -18,6 +18,6 @@
 
 `scripts/verify_system.py` 使用覆盖四个 profile 的合成 fixtures 调用 Windows validator、Mac schema validator 与 Mac normalizer，并检查 system profile、manifest、fixture、组件字段/枚举和 capability 集合保持一致。
 
-当前 readiness 仍为 `policy-v2-compatible-cutover-pending`：生产 Windows 已读回 `mac_job_contract_version=2` / `mac_permission_profiles_verified=true`，Mac `c0a14b1` 也已部署并完成 source binding；但部署后 Codex/Ornith canary 在 review profile 前失败。当前 pin `9cc94f3` 已修复 Ornith 数值工具边界并通过 macOS CI，尚未部署或跨机复核，因此不得把 source/CI 完成表述成 E2E 完成。
+当前 readiness 仍为 `policy-v2-compatible-cutover-pending`：生产 Windows 已读回 `mac_job_contract_version=2` / `mac_permission_profiles_verified=true`，Mac `9cc94f3` 也已部署并完成 source binding；但随后 canary `0007` 因 Ornith 工具轮数耗尽且最终 findings JSON 非法，在 review profile 前失败。当前 pin `911b5d8` 已把嵌套任务指令传给 worker，并以有界证据和精确 schema 约束最终无工具归纳；macOS CI 已通过，但尚未部署或跨机复核，因此不得把 source/CI 完成表述成 E2E 完成。
 
 Mac Runner 已定义结构化 result schema，但 Windows Lead 当前按 Buzz 原 thread 与本地账本记录状态，还没有消费同一个机器可读 result schema。因此 result contract 保持 `shared-result-contract-pending`，不得假定两边已经完成结构化结果互操作。
