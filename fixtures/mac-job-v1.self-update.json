@@ -1,0 +1,37 @@
+{
+  "schema": "mac-job/v1",
+  "policy_version": 2,
+  "job_id": "system-compatibility-self-update-0001",
+  "attempt": 1,
+  "repo_id": "example-repository",
+  "base_sha": "0000000000000000000000000000000000000000",
+  "target_sha": "1111111111111111111111111111111111111111",
+  "task_type": "self-update",
+  "focus": [
+    "runner-self-update"
+  ],
+  "permission_profile": "privileged",
+  "capabilities": [
+    "self-update-runner"
+  ],
+  "scope": {
+    "root": "registered-checkout"
+  },
+  "network": {
+    "mode": "declared-remotes-and-registries"
+  },
+  "verification_profiles": [
+    "self-update-runner"
+  ],
+  "owner_approval": {
+    "approved_by": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "approval_ref": "synthetic-self-update-approval",
+    "approved_at": "2026-08-25T12:00:00+09:00",
+    "summary": "capability=self-update-runner;repo=example-repository;job=system-compatibility-self-update-0001;attempt=1;base=0000000000000000000000000000000000000000;target=1111111111111111111111111111111111111111;service=com.example.dual-agent-mac-runner;url=https://github.com/example/dual-agent-mac-runner.git;remote=origin;branch=main"
+  },
+  "deadline_seconds": 1800,
+  "supervisor": "mac-codex",
+  "execution_route": "auto",
+  "preferred_worker": "codex",
+  "required_capabilities": []
+}

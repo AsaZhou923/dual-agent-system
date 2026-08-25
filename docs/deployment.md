@@ -25,10 +25,13 @@
 -> read-only compatibility job
 -> standard-worktree policy-v2 canary
 -> 每个启用的 operational capability 独立 canary
+-> 首次人工 bootstrap self-update handler/helper/config/source marker
+-> Mac status/dry-run 证明后启用 Windows self-update verified gate
+-> 后续 self-update privileged canary
 -> 原 thread ACK/状态核验
 -> Windows Lead 最终接受
 ```
 
-不得通过移动或删除正在运行的旧目录完成切换。保留旧源码路径和服务定义，直到新版本握手和回滚验证完成。
+不得无备份地移动或删除正在运行的旧目录。self-update helper 必须先保存完整 app/config/SQLite 回滚边界，再切换候选目录、重启固定 LaunchAgent，并在新 Runner 从原 attempt 的 `VERIFYING` 恢复后验证 source/config/SQLite/PID。保留回滚副本直到新的跨机 canary 完成。
 
 当前组件 source pin 和 policy-v2 合同已验证；真实跨机器闭环仍需使用新的 attempt 重新验收。完成前 Windows 必须保持旧 wire gate，不能把总仓库的源码兼容状态等同于生产切换完成。

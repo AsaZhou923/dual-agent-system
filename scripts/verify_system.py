@@ -197,6 +197,12 @@ def verify_components(compatibility: dict[str, Any]) -> None:
             raise VerificationError(f"Mac Runner changed scope in fixture: {fixture_path}")
         if fixture.get("owner_approval") != canonical.get("owner_approval"):
             raise VerificationError(f"Mac Runner changed owner approval in fixture: {fixture_path}")
+        if fixture.get("capabilities") == ["self-update-runner"]:
+            expected_profile = getattr(mac, "SELF_UPDATE_TEST_PROFILE", None)
+            if fixture.get("verification_profiles") != [expected_profile]:
+                raise VerificationError(
+                    f"self-update fixture does not use the Mac Runner reserved profile: {fixture_path}"
+                )
         fixture_profiles.add(str(fixture["permission_profile"]))
 
     system_properties = set(system_schema["properties"])

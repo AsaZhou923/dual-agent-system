@@ -11,7 +11,7 @@
 | Git SHA | 接受大小写并规范化为小写 | 只接受小写 | 只允许小写 |
 | 权限 profile | 四档 policy v2，legacy adapter | 四档 policy v2，legacy adapter | 四档 policy v2 |
 | standard write | worktree 授权，paths 可选缩小 | worktree、敏感路径、diff/文件数门禁 | task worktree，默认无逐文件审批 |
-| operational | 6 个命名 capability；`prepare-registered-repo` 独占且断网 | 6 个固定 handler，配置级 allowlist；prepare 仍需 repo 级绑定 | 当前交集为 6 个 capability，每个任务恰好 1 个 |
+| capabilities | 7 个命名 capability；`prepare-registered-repo` 独占且断网；`self-update-runner` privileged-only 并有独立 bootstrap gate | 7 个固定 handler；self-update 绑定源码 repo、外部 helper、安装根和 Runner LaunchAgent，并从 `VERIFYING` 跨重启恢复 | 当前交集为 7 个 capability，每个 operational/privileged 任务恰好 1 个 |
 | privileged | 结构化 owner approval 且 approver 必须匹配 | approval 新鲜度、owner 和确定性摘要复核 | 结构化 approval 必填 |
 
 因此组件自己的 schema 仍不是 system wire contract 的直接替代品。Windows Lead 发送跨机任务时必须遵守根目录 system profile；Mac Runner 继续执行更具体的 repo、capability binding、敏感路径和 owner approval 门禁。

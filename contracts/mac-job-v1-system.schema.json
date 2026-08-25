@@ -61,6 +61,7 @@
         "analyze",
         "fix",
         "prepare",
+        "self-update",
         "test",
         "sync"
       ]
@@ -97,7 +98,8 @@
           "push-task-branch",
           "manage-pr",
           "install-user-tool",
-          "restart-user-service"
+          "restart-user-service",
+          "self-update-runner"
         ]
       },
       "uniqueItems": true,
@@ -267,6 +269,42 @@
     {
       "if": {
         "properties": {
+          "capabilities": {
+            "contains": {
+              "const": "self-update-runner"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "task_type": {
+            "const": "self-update"
+          },
+          "permission_profile": {
+            "const": "privileged"
+          },
+          "network": {
+            "properties": {
+              "mode": {
+                "const": "declared-remotes-and-registries"
+              }
+            }
+          },
+          "execution_route": {
+            "const": "auto"
+          },
+          "verification_profiles": {
+            "const": [
+              "self-update-runner"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
           "permission_profile": {
             "const": "standard-worktree"
           }
@@ -426,7 +464,8 @@
                 "sync-registered-repo",
                 "push-task-branch",
                 "manage-pr",
-                "install-user-tool"
+                "install-user-tool",
+                "self-update-runner"
               ]
             }
           }
