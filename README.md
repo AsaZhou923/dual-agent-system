@@ -15,7 +15,7 @@ Windows Codex Lead
 | 组件 | 仓库 | 当前固定 commit |
 | --- | --- | --- |
 | Windows Lead | `components/windows-lead` | `1956d5da42a0660bace0943c72bf299bc1cf690b` |
-| Mac Runner | `components/mac-runner` | `c0a14b10fb1261babaa07eab7018bd476b179c1d` |
+| Mac Runner | `components/mac-runner` | `9cc94f3110e32a3cdf1415685d6f6759439bb595` |
 
 两个目录都是公开 Git submodule。组件独立版本控制，总仓库 commit 表示一组明确的系统组合。
 
@@ -24,7 +24,7 @@ Windows Codex Lead
 - 两个组件固定到已发布 commit；本地组件/合同验证已通过，GitHub-hosted CI 以对应 commit status 为准。
 - `mac-job/v1` system profile 已升级为两端都接受的严格 policy v2 交集。
 - `observe`、`standard-worktree`、`operational`、`privileged` 四档 profile、canonical `codex` route 和六个命名 operational capability 已通过组件 validator fixture 验证；其中 `prepare-registered-repo` 独占、断网且仅用于注册 checkout 准备。
-- Mac 修复已并入 `main`，目标临时分支已删除，分支与 `main` 的 macOS CI 均成功。源码 pin 已闭环，但生产 Mac 部署和新的跨机 canary 尚未执行，因此总仓 runtime readiness 继续保持 pending。
+- Mac `c0a14b1` 部署后的 Codex/Ornith canary 分别暴露 timeout 和非法 `max_chars`；`9cc94f3` 已将只读数值参数安全 clamp 到 schema 上限并通过 macOS CI。该新 pin 尚未部署和跨机复核，因此总仓 runtime readiness 继续保持 pending。
 - Buzz 固定到用户 fork 的 `6793b4ef98b11a64e4ead1e88ee5ec33ebe3f002`，包含 NIP-OA owner 保留和 observer NIP-44 明文上限修复。
 - 网络范围仍是 `intranet-only`。
 
