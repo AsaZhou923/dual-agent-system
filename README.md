@@ -15,7 +15,7 @@ Windows Codex Lead
 | 组件 | 仓库 | 当前固定 commit |
 | --- | --- | --- |
 | Windows Lead | `components/windows-lead` | `51f6a36d3be4393eec84bff12217a501c2983157` |
-| Mac Runner | `components/mac-runner` | `c249a50c1430e824817a6397cfa583fdeaa996bc` |
+| Mac Runner | `components/mac-runner` | `47d7ca326e02777b77d569a7749f15153f98149d` |
 
 两个目录都是公开 Git submodule。组件独立版本控制，总仓库 commit 表示一组明确的系统组合。
 

@@ -19,7 +19,7 @@
     "mac_runner": {
       "repository": "https://github.com/AsaZhou923/dual-agent-mac-runner.git",
       "path": "components/mac-runner",
-      "commit": "c249a50c1430e824817a6397cfa583fdeaa996bc",
+      "commit": "47d7ca326e02777b77d569a7749f15153f98149d",
       "branch": "main"
     }
   },
